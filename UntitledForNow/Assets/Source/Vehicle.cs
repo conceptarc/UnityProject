@@ -23,6 +23,7 @@ public class Vehicle : MonoBehaviour {
         this.TurnRate = TurnRate;
         this.MaxTurnRate = MaxTurnRate;
 
+
         IsInitialized = true;
     }
 
