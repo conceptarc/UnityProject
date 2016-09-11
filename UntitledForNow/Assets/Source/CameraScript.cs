@@ -19,7 +19,7 @@ public class CameraScript : MonoBehaviour {
     float CameraZoomRate = 5; // variable depends on a user's mouse wheel speed
     float CameraDistanceMin = 4; // lowest zoom-in distance
     float CameraDistanceMax = 30; // furthest zoom-out distance
-    float CameraDistance = 15;
+    float CameraDistance = 20;
     bool IsCameraLocked = true; // if the FocusTarget is locked on to another object
     float CameraPanRate = 1; // similar use as the CameraZoomRate
 
@@ -27,7 +27,7 @@ public class CameraScript : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        //Application.targetFrameRate = 60;
+        Application.targetFrameRate = 60;
         Camera mainCam = Camera.allCameras[0];
         mainCam.aspect = 1.6f;
 
@@ -39,7 +39,7 @@ public class CameraScript : MonoBehaviour {
 
         //Debug.Log("test : " + FocusTarget.name);
         FocusTarget.transform.parent = GameObject.Find("fillerCar").transform;
-        Debug.Log("test : " + FocusTarget.transform.parent.name);
+        //Debug.Log("test : " + FocusTarget.transform.parent.name);
         TempVector3.Set(0, 0, 0);
         FocusTarget.transform.localPosition = TempVector3;
     }
@@ -59,6 +59,19 @@ public class CameraScript : MonoBehaviour {
         {
             CameraRotation.x += (Input.mousePosition.x - MouseOld.x) * CameraRotationRate.x;
             CameraRotation.y -= (Input.mousePosition.y - MouseOld.y) * CameraRotationRate.y;
+        }
+        else // face forward
+        {
+            Transform car = FocusTarget.transform.parent.transform;
+
+            // the transform oriention is rotated when importing
+            // euler angles sometimes jitter due to gimbal locking
+            float carAngle = Mathf.Atan2(-car.up.x, -car.up.z) * 180 / Mathf.PI;
+            float deltaAngle = (carAngle - CameraRotation.x) % 360;
+            if (deltaAngle > 180) deltaAngle -= 360;
+            if (deltaAngle < -180) deltaAngle += 360;
+
+            CameraRotation.x += deltaAngle * CameraRotationRate.x;
         }
 
         if (!IsCameraLocked)
